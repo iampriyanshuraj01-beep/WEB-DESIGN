@@ -1,0 +1,1235 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Advanced Inventory Management System</title>
+
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; font-family: "Segoe UI", Arial, sans-serif; }
+
+    :root {
+      --bg: #eef3f8;
+      --dark: #101828;
+      --side: #111827;
+      --card: #ffffff;
+      --line: #e5e7eb;
+      --muted: #667085;
+      --blue: #2563eb;
+      --cyan: #06b6d4;
+      --green: #16a34a;
+      --orange: #f97316;
+      --red: #dc2626;
+      --shadow: 0 16px 40px rgba(16,24,40,.12);
+    }
+
+    body { background: var(--bg); color: #1f2937; }
+
+    .app {
+      display: grid;
+      grid-template-columns: 270px 1fr;
+      min-height: 100vh;
+    }
+
+    .sidebar {
+      background: var(--side);
+      color: white;
+      padding: 24px;
+      position: sticky;
+      top: 0;
+      height: 100vh;
+    }
+
+    .logo {
+      display: flex;
+      gap: 12px;
+      align-items: center;
+      margin-bottom: 30px;
+    }
+
+    .logo-icon {
+      width: 48px;
+      height: 48px;
+      border-radius: 14px;
+      display: grid;
+      place-items: center;
+      background: linear-gradient(135deg,var(--blue),var(--cyan));
+      font-weight: 900;
+    }
+
+    .logo p,
+    .note {
+      color: #cbd5e1;
+      font-size: 13px;
+    }
+
+    .menu {
+      display: grid;
+      gap: 8px;
+    }
+
+    .menu button {
+      border: 0;
+      background: transparent;
+      color: #cbd5e1;
+      text-align: left;
+      padding: 13px 14px;
+      border-radius: 12px;
+      font-weight: 800;
+      cursor: pointer;
+    }
+
+    .menu button:hover,
+    .menu button.active {
+      background: rgba(255,255,255,.12);
+      color: white;
+    }
+
+    .note {
+      margin-top: 28px;
+      background: rgba(255,255,255,.08);
+      padding: 15px;
+      border-radius: 14px;
+      line-height: 1.5;
+    }
+
+    .main { padding: 24px; }
+
+    .topbar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 15px;
+      margin-bottom: 22px;
+      flex-wrap: wrap;
+    }
+
+    .title small {
+      color: var(--muted);
+      font-weight: 900;
+      text-transform: uppercase;
+    }
+
+    .title h1 {
+      font-size: 31px;
+      color: var(--dark);
+    }
+
+    .search {
+      width: 330px;
+      padding: 12px 14px;
+      border: 1px solid var(--line);
+      border-radius: 12px;
+      outline: 0;
+    }
+
+    .btn {
+      border: 0;
+      padding: 12px 16px;
+      border-radius: 12px;
+      background: var(--blue);
+      color: white;
+      font-weight: 900;
+      cursor: pointer;
+    }
+
+    .btn:hover {
+      filter: brightness(.96);
+      transform: translateY(-1px);
+    }
+
+    .btn.dark { background: #334155; }
+    .btn.green { background: var(--green); }
+    .btn.red { background: var(--red); }
+
+    .page { display: none; }
+    .page.active { display: block; }
+
+    .hero {
+      display: grid;
+      grid-template-columns: 1.3fr .7fr;
+      gap: 18px;
+      background: linear-gradient(135deg,#0f172a,#2563eb);
+      color: white;
+      border-radius: 22px;
+      padding: 28px;
+      box-shadow: var(--shadow);
+      margin-bottom: 20px;
+    }
+
+    .hero h2 {
+      font-size: 32px;
+      margin-bottom: 10px;
+    }
+
+    .hero p {
+      color: #dbeafe;
+      line-height: 1.6;
+    }
+
+    .hero-box {
+      background: rgba(255,255,255,.13);
+      border-radius: 18px;
+      padding: 18px;
+    }
+
+    .hero-box span { color: #bfdbfe; }
+
+    .hero-box h3 {
+      font-size: 30px;
+      margin-top: 5px;
+    }
+
+    .stats {
+      display: grid;
+      grid-template-columns: repeat(5,1fr);
+      gap: 16px;
+      margin-bottom: 20px;
+    }
+
+    .card,
+    .panel {
+      background: var(--card);
+      border: 1px solid var(--line);
+      border-radius: 18px;
+      box-shadow: var(--shadow);
+    }
+
+    .card { padding: 20px; }
+
+    .card p {
+      color: var(--muted);
+      font-weight: 900;
+      margin-bottom: 6px;
+    }
+
+    .card h2 {
+      font-size: 28px;
+      color: var(--dark);
+    }
+
+    .grid {
+      display: grid;
+      grid-template-columns: 390px 1fr;
+      gap: 18px;
+      align-items: start;
+    }
+
+    .panel {
+      padding: 20px;
+      margin-bottom: 18px;
+    }
+
+    .panel h2 {
+      color: var(--dark);
+      margin-bottom: 5px;
+    }
+
+    .panel small { color: var(--muted); }
+
+    .form {
+      display: grid;
+      gap: 13px;
+      margin-top: 16px;
+    }
+
+    .row {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+    }
+
+    label {
+      font-size: 13px;
+      font-weight: 900;
+      color: #344054;
+      margin-bottom: 7px;
+      display: block;
+    }
+
+    input,
+    select {
+      width: 100%;
+      padding: 12px;
+      border: 1px solid #d0d5dd;
+      border-radius: 11px;
+      outline: 0;
+      font-size: 15px;
+      background: white;
+    }
+
+    input:focus,
+    select:focus {
+      border-color: var(--blue);
+      box-shadow: 0 0 0 4px rgba(37,99,235,.12);
+    }
+
+    .actions,
+    .filters {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+
+    .msg {
+      color: var(--green);
+      font-weight: 900;
+      min-height: 22px;
+    }
+
+    .filters { margin: 16px 0; }
+
+    .chip {
+      border: 1px solid var(--line);
+      background: white;
+      padding: 9px 12px;
+      border-radius: 999px;
+      font-weight: 900;
+      cursor: pointer;
+    }
+
+    .chip.active {
+      background: var(--dark);
+      color: white;
+    }
+
+    .table-wrap { overflow-x: auto; }
+
+    table {
+      width: 100%;
+      min-width: 980px;
+      border-collapse: collapse;
+    }
+
+    th,
+    td {
+      padding: 13px;
+      border-bottom: 1px solid var(--line);
+      text-align: left;
+      font-size: 14px;
+    }
+
+    th {
+      background: #f8fafc;
+      color: #667085;
+      text-transform: uppercase;
+      font-size: 12px;
+    }
+
+    tbody tr:hover { background: #f8fafc; }
+
+    .badge {
+      padding: 6px 10px;
+      border-radius: 999px;
+      font-weight: 900;
+      font-size: 12px;
+      display: inline-block;
+    }
+
+    .available { background: #dcfce7; color: #15803d; }
+    .low { background: #ffedd5; color: #c2410c; }
+    .out { background: #fee2e2; color: #b91c1c; }
+
+    .small {
+      border: 0;
+      padding: 8px 10px;
+      border-radius: 9px;
+      font-weight: 900;
+      cursor: pointer;
+    }
+
+    .sell { background: #dcfce7; color: #15803d; }
+    .edit { background: #dbeafe; color: #1d4ed8; }
+    .del { background: #fee2e2; color: #b91c1c; }
+
+    .bottom {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 18px;
+    }
+
+    .bar { margin: 14px 0; }
+
+    .bar-title {
+      display: flex;
+      justify-content: space-between;
+      font-weight: 900;
+      font-size: 14px;
+    }
+
+    .track {
+      height: 10px;
+      background: #e5e7eb;
+      border-radius: 99px;
+      overflow: hidden;
+      margin-top: 7px;
+    }
+
+    .fill {
+      height: 100%;
+      background: linear-gradient(90deg,var(--blue),var(--cyan));
+    }
+
+    .activity,
+    .link-card {
+      background: #f8fafc;
+      border: 1px solid var(--line);
+      padding: 13px;
+      border-radius: 13px;
+      margin-top: 10px;
+    }
+
+    .link-card a {
+      color: var(--blue);
+      font-weight: 900;
+      text-decoration: none;
+    }
+
+    .invoice-box {
+      background: white;
+      color: #111827;
+    }
+
+    .invoice-head {
+      display: flex;
+      justify-content: space-between;
+      gap: 12px;
+      flex-wrap: wrap;
+      margin: 10px 0 16px;
+    }
+
+    @media(max-width:1150px) {
+      .app { grid-template-columns: 1fr; }
+      .sidebar { height: auto; position: relative; }
+      .menu { grid-template-columns: repeat(3,1fr); }
+      .grid,
+      .hero { grid-template-columns: 1fr; }
+      .stats { grid-template-columns: repeat(2,1fr); }
+    }
+
+    @media(max-width:720px) {
+      .stats,
+      .bottom,
+      .row { grid-template-columns: 1fr; }
+
+      .search,
+      .btn { width: 100%; }
+
+      .topbar { align-items: stretch; }
+
+      .menu { grid-template-columns: 1fr 1fr; }
+    }
+
+    @media print {
+      body * { visibility: hidden; }
+
+      #invoicePrint,
+      #invoicePrint * {
+        visibility: visible;
+      }
+
+      #invoicePrint {
+        position: absolute;
+        left: 0;
+        top: 0;
+        width: 100%;
+        box-shadow: none;
+        border: 0;
+      }
+    }
+  </style>
+</head>
+
+<body>
+<div class="app">
+  <aside class="sidebar">
+    <div class="logo">
+      <div class="logo-icon">IP</div>
+      <div>
+        <h2>InventPro</h2>
+        <p>Advanced IMS</p>
+      </div>
+    </div>
+
+    <div class="menu">
+      <button class="active" onclick="showPage('dashboard',this)">Dashboard</button>
+      <button onclick="showPage('products',this)">Products</button>
+      <button onclick="showPage('billing',this)">Billing</button>
+      <button onclick="showPage('sales',this)">Sales</button>
+      <button onclick="showPage('reports',this)">Reports</button>
+      <button onclick="showPage('compliance',this)">Compliance</button>
+    </div>
+
+    <div class="note">
+      Advanced features: auto sales, profit, GST, invoice, stock value, business IDs, official ITR/GST links, reports and localStorage.
+    </div>
+  </aside>
+
+  <main class="main">
+    <header class="topbar">
+      <div class="title">
+        <small>Warehouse + Billing + Tax Panel</small>
+        <h1>Inventory Management System</h1>
+      </div>
+
+      <input class="search" id="globalSearch" placeholder="Search product, SKU, supplier..." oninput="renderProducts()">
+    </header>
+
+    <section id="dashboard" class="page active">
+      <div class="hero">
+        <div>
+          <h2>Manage inventory, sales, profit, GST and compliance from one dashboard.</h2>
+          <p>This all-in-one project uses pure HTML, CSS and JavaScript. It saves data in browser localStorage and calculates totals automatically.</p>
+        </div>
+
+        <div class="hero-box">
+          <span>Total Inventory Value</span>
+          <h3 id="inventoryValue">Rs. 0</h3>
+          <p>Stock x selling price.</p>
+        </div>
+      </div>
+
+      <div class="stats">
+        <div class="card">
+          <p>Total Products</p>
+          <h2 id="totalProducts">0</h2>
+        </div>
+
+        <div class="card">
+          <p>Total Stock</p>
+          <h2 id="totalStock">0</h2>
+        </div>
+
+        <div class="card">
+          <p>Total Sales</p>
+          <h2 id="totalSales">Rs. 0</h2>
+        </div>
+
+        <div class="card">
+          <p>Total Profit</p>
+          <h2 id="totalProfit">Rs. 0</h2>
+        </div>
+
+        <div class="card">
+          <p>Total GST</p>
+          <h2 id="totalGST">Rs. 0</h2>
+        </div>
+      </div>
+
+      <div class="bottom">
+        <div class="panel">
+          <h2>Category Value</h2>
+          <small>Live stock valuation</small>
+          <div id="categoryBars"></div>
+        </div>
+
+        <div class="panel">
+          <h2>Recent Activity</h2>
+          <small>Latest updates</small>
+          <div id="activityList"></div>
+        </div>
+      </div>
+    </section>
+
+    <section id="products" class="page">
+      <div class="grid">
+        <div class="panel">
+          <h2 id="formTitle">Add Product</h2>
+          <small>Cost price enables auto profit calculation</small>
+
+          <form class="form" id="productForm">
+            <input type="hidden" id="editId">
+
+            <div>
+              <label>Product Name</label>
+              <input id="pName" required placeholder="Dell Laptop">
+            </div>
+
+            <div class="row">
+              <div>
+                <label>SKU</label>
+                <input id="pSku" required placeholder="LP-1001">
+              </div>
+
+              <div>
+                <label>Category</label>
+                <select id="pCategory" required>
+                  <option value="">Select</option>
+                  <option>Electronics</option>
+                  <option>Furniture</option>
+                  <option>Accessories</option>
+                  <option>Office Items</option>
+                  <option>Stationery</option>
+                  <option>General</option>
+                </select>
+              </div>
+            </div>
+
+            <div class="row">
+              <div>
+                <label>Cost Price</label>
+                <input id="pCost" type="number" min="1" required>
+              </div>
+
+              <div>
+                <label>Selling Price</label>
+                <input id="pPrice" type="number" min="1" required>
+              </div>
+            </div>
+
+            <div class="row">
+              <div>
+                <label>Stock</label>
+                <input id="pStock" type="number" min="0" required>
+              </div>
+
+              <div>
+                <label>GST Rate (%)</label>
+                <input id="pGst" type="number" min="0" value="18" required>
+              </div>
+            </div>
+
+            <div>
+              <label>Supplier</label>
+              <input id="pSupplier" required placeholder="TechSource India">
+            </div>
+
+            <div class="actions">
+              <button class="btn" type="submit" id="saveBtn">Save Product</button>
+              <button class="btn dark" type="button" onclick="resetForm()">Clear</button>
+            </div>
+
+            <p class="msg" id="msg"></p>
+          </form>
+        </div>
+
+        <div class="panel">
+          <h2>Product Inventory</h2>
+          <small>Search, filter, sell, edit and delete</small>
+
+          <div class="filters">
+            <button class="chip active" onclick="setFilter('All',this)">All</button>
+            <button class="chip" onclick="setFilter('Available',this)">Available</button>
+            <button class="chip" onclick="setFilter('Low Stock',this)">Low Stock</button>
+            <button class="chip" onclick="setFilter('Out of Stock',this)">Out of Stock</button>
+          </div>
+
+          <div class="table-wrap">
+            <table>
+              <thead>
+                <tr>
+                  <th>Product</th>
+                  <th>Category</th>
+                  <th>Stock</th>
+                  <th>Cost</th>
+                  <th>Sell</th>
+                  <th>GST</th>
+                  <th>Value</th>
+                  <th>Status</th>
+                  <th>Action</th>
+                </tr>
+              </thead>
+              <tbody id="productTable"></tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section id="billing" class="page">
+      <div class="grid">
+        <div class="panel">
+          <h2>Customer Billing</h2>
+          <small>Invoice calculates subtotal, GST, grand total and profit</small>
+
+          <div class="form">
+            <div>
+              <label>Customer Name</label>
+              <input id="cName" placeholder="Customer name">
+            </div>
+
+            <div>
+              <label>Phone Number</label>
+              <input id="cPhone" placeholder="9876543210">
+            </div>
+
+            <div>
+              <label>Select Product</label>
+              <select id="sellProduct"></select>
+            </div>
+
+            <div>
+              <label>Quantity</label>
+              <input type="number" id="sellQty" min="1" placeholder="1">
+            </div>
+
+            <button class="btn green" onclick="addToInvoice()">Add To Invoice</button>
+          </div>
+        </div>
+
+        <div class="panel invoice-box" id="invoicePrint">
+          <h2>Tax Invoice</h2>
+
+          <div class="invoice-head">
+            <p><b>Invoice:</b> <span id="invoiceNo"></span></p>
+            <p><b>Date:</b> <span id="invoiceDate"></span></p>
+            <p><b>Customer:</b> <span id="invoiceCustomer">-</span></p>
+          </div>
+
+          <div class="table-wrap">
+            <table>
+              <thead>
+                <tr>
+                  <th>Product</th>
+                  <th>Qty</th>
+                  <th>Rate</th>
+                  <th>GST</th>
+                  <th>Total</th>
+                  <th>Profit</th>
+                </tr>
+              </thead>
+              <tbody id="invoiceTable"></tbody>
+            </table>
+          </div>
+
+          <h3>Subtotal: <span id="subTotal">Rs. 0</span></h3>
+          <h3>GST Total: <span id="gstAmount">Rs. 0</span></h3>
+          <h3>Profit: <span id="invoiceProfit">Rs. 0</span></h3>
+          <h2>Grand Total: <span id="grandTotal">Rs. 0</span></h2>
+
+          <br>
+
+          <div class="actions">
+            <button class="btn" onclick="completeSale()">Save & Print</button>
+            <button class="btn dark" onclick="clearInvoice()">Clear</button>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section id="sales" class="page">
+      <div class="panel">
+        <h2>Sales History</h2>
+        <small>Completed invoices with profit and GST</small>
+
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th>Invoice</th>
+                <th>Customer</th>
+                <th>Phone</th>
+                <th>Sale</th>
+                <th>GST</th>
+                <th>Profit</th>
+                <th>Date</th>
+              </tr>
+            </thead>
+            <tbody id="salesTable"></tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+
+    <section id="reports" class="page">
+      <div class="bottom">
+        <div class="panel">
+          <h2>Stock Report</h2>
+          <div id="stockReport"></div>
+        </div>
+
+        <div class="panel">
+          <h2>Business Summary</h2>
+          <div id="summaryReport"></div>
+        </div>
+      </div>
+    </section>
+
+    <section id="compliance" class="page">
+      <div class="grid">
+        <div class="panel">
+          <h2>Business Compliance Details</h2>
+          <small>Use your real IDs only in your own browser/project file</small>
+
+          <div class="form">
+            <div>
+              <label>Business / Firm Name</label>
+              <input id="bizName" placeholder="Your business name">
+            </div>
+
+            <div class="row">
+              <div>
+                <label>License Number</label>
+                <input id="licenseNo" placeholder="Trade/FSSAI/Shop license no.">
+              </div>
+
+              <div>
+                <label>GSTIN</label>
+                <input id="gstin" placeholder="22AAAAA0000A1Z5">
+              </div>
+            </div>
+
+            <div class="row">
+              <div>
+                <label>TIN ID / Legacy Tax ID</label>
+                <input id="tinId" placeholder="Optional / legacy">
+              </div>
+
+              <div>
+                <label>PAN</label>
+                <input id="panNo" placeholder="ABCDE1234F">
+              </div>
+            </div>
+
+            <button class="btn" onclick="saveCompliance()">Save Compliance Details</button>
+            <p class="msg" id="complianceMsg"></p>
+          </div>
+        </div>
+
+        <div class="panel">
+          <h2>Official Filing Links</h2>
+          <small>Direct official government portals</small>
+
+          <div class="link-card">
+            <b>Income Tax ITR Filing Portal</b><br>
+            <a href="https://www.incometax.gov.in/iec/foportal/" target="_blank">Open official Income Tax e-Filing portal</a>
+          </div>
+
+          <div class="link-card">
+            <b>GST Portal</b><br>
+            <a href="https://www.gst.gov.in/" target="_blank">Open official GST portal</a>
+          </div>
+
+          <div class="link-card">
+            <b>Note:</b> This project calculates sales/profit/GST for learning. Verify tax filing details with a CA or official portal before submission.
+          </div>
+        </div>
+      </div>
+    </section>
+  </main>
+</div>
+
+<script>
+const sampleProducts = [
+  { id: 1, name: "Dell Inspiron Laptop", sku: "LP-1001", category: "Electronics", cost: 50000, price: 56000, stock: 42, gst: 18, supplier: "TechSource India" },
+  { id: 2, name: "Office Chair Premium", sku: "FR-2024", category: "Furniture", cost: 3200, price: 4500, stock: 18, gst: 18, supplier: "WorkFit Furnishings" },
+  { id: 3, name: "Wireless Mouse", sku: "AC-3311", category: "Accessories", cost: 450, price: 799, stock: 160, gst: 18, supplier: "CorePack Supplies" },
+  { id: 4, name: "HP Laser Printer", sku: "PR-7782", category: "Office Items", cost: 12000, price: 14999, stock: 0, gst: 18, supplier: "OfficeHub Traders" },
+  { id: 5, name: "A4 Notebook Pack", sku: "ST-5050", category: "Stationery", cost: 80, price: 120, stock: 230, gst: 12, supplier: "PaperLine Distributors" }
+];
+
+let products = JSON.parse(localStorage.getItem("advProducts")) || sampleProducts;
+let sales = JSON.parse(localStorage.getItem("advSales")) || [];
+let activities = JSON.parse(localStorage.getItem("advActivities")) || ["System started with advanced inventory data."];
+let compliance = JSON.parse(localStorage.getItem("advCompliance")) || {};
+let invoice = [];
+let filter = "All";
+
+function money(n) {
+  return "Rs. " + Number(n || 0).toLocaleString("en-IN", { maximumFractionDigits: 2 });
+}
+
+function save() {
+  localStorage.setItem("advProducts", JSON.stringify(products));
+  localStorage.setItem("advSales", JSON.stringify(sales));
+  localStorage.setItem("advActivities", JSON.stringify(activities));
+  localStorage.setItem("advCompliance", JSON.stringify(compliance));
+}
+
+function activity(text) {
+  activities.unshift(text);
+  activities = activities.slice(0, 6);
+  save();
+}
+
+function status(stock) {
+  if (stock === 0) return "Out of Stock";
+  if (stock <= 20) return "Low Stock";
+  return "Available";
+}
+
+function statusClass(statusText) {
+  return statusText === "Available" ? "available" : statusText === "Low Stock" ? "low" : "out";
+}
+
+function showPage(id, btn) {
+  document.querySelectorAll(".page").forEach(page => page.classList.remove("active"));
+  document.getElementById(id).classList.add("active");
+
+  document.querySelectorAll(".menu button").forEach(button => button.classList.remove("active"));
+  btn.classList.add("active");
+
+  renderAll();
+}
+
+productForm.addEventListener("submit", function(event) {
+  event.preventDefault();
+
+  const id = editId.value;
+
+  const product = {
+    id: id ? Number(id) : Date.now(),
+    name: pName.value.trim(),
+    sku: pSku.value.trim(),
+    category: pCategory.value,
+    cost: Number(pCost.value),
+    price: Number(pPrice.value),
+    stock: Number(pStock.value),
+    gst: Number(pGst.value),
+    supplier: pSupplier.value.trim()
+  };
+
+  if (id) {
+    products = products.map(item => item.id === product.id ? product : item);
+    activity(product.name + " updated.");
+  } else {
+    products.push(product);
+    activity(product.name + " added.");
+  }
+
+  save();
+  resetForm();
+  renderAll();
+  msg.textContent = "Product saved successfully.";
+});
+
+function resetForm() {
+  productForm.reset();
+  editId.value = "";
+  pGst.value = 18;
+  formTitle.textContent = "Add Product";
+  saveBtn.textContent = "Save Product";
+}
+
+function editProduct(id) {
+  const product = products.find(item => item.id === id);
+
+  editId.value = product.id;
+  pName.value = product.name;
+  pSku.value = product.sku;
+  pCategory.value = product.category;
+  pCost.value = product.cost;
+  pPrice.value = product.price;
+  pStock.value = product.stock;
+  pGst.value = product.gst;
+  pSupplier.value = product.supplier;
+
+  formTitle.textContent = "Edit Product";
+  saveBtn.textContent = "Update Product";
+
+  showPage("products", document.querySelectorAll(".menu button")[1]);
+}
+
+function deleteProduct(id) {
+  if (!confirm("Delete this product?")) return;
+
+  const product = products.find(item => item.id === id);
+  products = products.filter(item => item.id !== id);
+
+  activity(product.name + " deleted.");
+  save();
+  renderAll();
+}
+
+function sellNow(id) {
+  showPage("billing", document.querySelectorAll(".menu button")[2]);
+  sellProduct.value = id;
+  sellQty.focus();
+}
+
+function setFilter(selectedFilter, btn) {
+  filter = selectedFilter;
+
+  document.querySelectorAll(".chip").forEach(chip => chip.classList.remove("active"));
+  btn.classList.add("active");
+
+  renderProducts();
+}
+
+function renderProducts() {
+  const query = globalSearch.value.toLowerCase();
+  productTable.innerHTML = "";
+
+  const list = products.filter(product => {
+    const currentStatus = status(product.stock);
+    const searchableText = (product.name + product.sku + product.category + product.supplier).toLowerCase();
+
+    return searchableText.includes(query) && (filter === "All" || filter === currentStatus);
+  });
+
+  if (!list.length) {
+    productTable.innerHTML = "<tr><td colspan='9'>No products found.</td></tr>";
+    return;
+  }
+
+  list.forEach(product => {
+    const currentStatus = status(product.stock);
+
+    productTable.innerHTML += `
+      <tr>
+        <td><b>${product.name}</b><br><small>${product.sku}</small></td>
+        <td>${product.category}</td>
+        <td>${product.stock}</td>
+        <td>${money(product.cost)}</td>
+        <td>${money(product.price)}</td>
+        <td>${product.gst}%</td>
+        <td>${money(product.price * product.stock)}</td>
+        <td><span class="badge ${statusClass(currentStatus)}">${currentStatus}</span></td>
+        <td>
+          <div class="actions">
+            <button class="small sell" onclick="sellNow(${product.id})">Sell</button>
+            <button class="small edit" onclick="editProduct(${product.id})">Edit</button>
+            <button class="small del" onclick="deleteProduct(${product.id})">Delete</button>
+          </div>
+        </td>
+      </tr>
+    `;
+  });
+}
+
+function renderDashboard() {
+  const totalStockValue = products.reduce((sum, product) => sum + product.stock, 0);
+  const totalInventoryValue = products.reduce((sum, product) => sum + product.stock * product.price, 0);
+  const totalSaleValue = sales.reduce((sum, sale) => sum + sale.total, 0);
+  const totalProfitValue = sales.reduce((sum, sale) => sum + sale.profit, 0);
+  const totalGSTValue = sales.reduce((sum, sale) => sum + sale.gst, 0);
+
+  totalProducts.textContent = products.length;
+  totalStock.textContent = totalStockValue;
+  totalSales.textContent = money(totalSaleValue);
+  totalProfit.textContent = money(totalProfitValue);
+  totalGST.textContent = money(totalGSTValue);
+  inventoryValue.textContent = money(totalInventoryValue);
+
+  renderBars();
+  renderActivities();
+  renderReports();
+}
+
+function renderBars() {
+  const totals = {};
+
+  products.forEach(product => {
+    totals[product.category] = (totals[product.category] || 0) + product.stock * product.price;
+  });
+
+  const max = Math.max(...Object.values(totals), 1);
+  categoryBars.innerHTML = "";
+
+  Object.keys(totals).forEach(category => {
+    const percent = Math.round((totals[category] / max) * 100);
+
+    categoryBars.innerHTML += `
+      <div class="bar">
+        <div class="bar-title">
+          <span>${category}</span>
+          <span>${money(totals[category])}</span>
+        </div>
+        <div class="track">
+          <div class="fill" style="width:${percent}%"></div>
+        </div>
+      </div>
+    `;
+  });
+}
+
+function renderActivities() {
+  activityList.innerHTML = activities.map(item => `
+    <div class="activity">
+      <b>${item}</b><br>
+      <span>Inventory update</span>
+    </div>
+  `).join("");
+}
+
+function renderSellSelect() {
+  sellProduct.innerHTML = products.map(product => `
+    <option value="${product.id}">${product.name} - Stock ${product.stock}</option>
+  `).join("");
+}
+
+function addToInvoice() {
+  const id = Number(sellProduct.value);
+  const qty = Number(sellQty.value);
+  const product = products.find(item => item.id === id);
+
+  if (!cName.value.trim()) {
+    alert("Enter customer name");
+    return;
+  }
+
+  if (!qty || qty <= 0) {
+    alert("Enter valid quantity");
+    return;
+  }
+
+  if (qty > product.stock) {
+    alert("Not enough stock");
+    return;
+  }
+
+  product.stock -= qty;
+
+  const taxableAmount = product.price * qty;
+  const gstAmount = taxableAmount * product.gst / 100;
+  const profitAmount = (product.price - product.cost) * qty;
+
+  invoice.push({
+    name: product.name,
+    qty: qty,
+    price: product.price,
+    gst: gstAmount,
+    total: taxableAmount + gstAmount,
+    profit: profitAmount
+  });
+
+  invoiceCustomer.textContent = cName.value;
+
+  activity(qty + " " + product.name + " added to invoice.");
+  save();
+  renderInvoice();
+  renderAll();
+}
+
+function renderInvoice() {
+  invoiceTable.innerHTML = "";
+
+  let subtotal = 0;
+  let gst = 0;
+  let profit = 0;
+
+  invoice.forEach(item => {
+    subtotal += item.price * item.qty;
+    gst += item.gst;
+    profit += item.profit;
+
+    invoiceTable.innerHTML += `
+      <tr>
+        <td>${item.name}</td>
+        <td>${item.qty}</td>
+        <td>${money(item.price)}</td>
+        <td>${money(item.gst)}</td>
+        <td>${money(item.total)}</td>
+        <td>${money(item.profit)}</td>
+      </tr>
+    `;
+  });
+
+  subTotal.textContent = money(subtotal);
+  gstAmount.textContent = money(gst);
+  invoiceProfit.textContent = money(profit);
+  grandTotal.textContent = money(subtotal + gst);
+}
+
+function completeSale() {
+  if (!invoice.length) {
+    alert("Invoice is empty");
+    return;
+  }
+
+  const subtotal = invoice.reduce((sum, item) => sum + item.price * item.qty, 0);
+  const gst = invoice.reduce((sum, item) => sum + item.gst, 0);
+  const profit = invoice.reduce((sum, item) => sum + item.profit, 0);
+  const total = subtotal + gst;
+
+  sales.unshift({
+    invoice: invoiceNo.textContent,
+    customer: cName.value || "Walk-in",
+    phone: cPhone.value || "-",
+    total: total,
+    gst: gst,
+    profit: profit,
+    date: new Date().toLocaleString()
+  });
+
+  activity("Invoice " + invoiceNo.textContent + " completed.");
+
+  invoice = [];
+  save();
+  renderInvoice();
+  renderAll();
+  window.print();
+  newInvoice();
+}
+
+function clearInvoice() {
+  invoice = [];
+  renderInvoice();
+  newInvoice();
+}
+
+function newInvoice() {
+  invoiceNo.textContent = "INV-" + Math.floor(100000 + Math.random() * 900000);
+  invoiceDate.textContent = new Date().toLocaleString();
+}
+
+function renderSales() {
+  salesTable.innerHTML = sales.map(sale => `
+    <tr>
+      <td>${sale.invoice}</td>
+      <td>${sale.customer}</td>
+      <td>${sale.phone}</td>
+      <td>${money(sale.total)}</td>
+      <td>${money(sale.gst)}</td>
+      <td>${money(sale.profit)}</td>
+      <td>${sale.date}</td>
+    </tr>
+  `).join("") || "<tr><td colspan='7'>No sales yet.</td></tr>";
+}
+
+function renderReports() {
+  const out = products.filter(product => product.stock === 0).length;
+  const low = products.filter(product => product.stock > 0 && product.stock <= 20).length;
+  const available = products.filter(product => product.stock > 20).length;
+
+  const totalProfitValue = sales.reduce((sum, sale) => sum + sale.profit, 0);
+  const totalGSTValue = sales.reduce((sum, sale) => sum + sale.gst, 0);
+
+  stockReport.innerHTML = `
+    <div class="activity"><b>Available:</b> ${available}</div>
+    <div class="activity"><b>Low Stock:</b> ${low}</div>
+    <div class="activity"><b>Out of Stock:</b> ${out}</div>
+  `;
+
+  summaryReport.innerHTML = `
+    <div class="activity"><b>Total Profit:</b> ${money(totalProfitValue)}</div>
+    <div class="activity"><b>Total GST Collected:</b> ${money(totalGSTValue)}</div>
+    <div class="activity"><b>Total Invoices:</b> ${sales.length}</div>
+  `;
+}
+
+function saveCompliance() {
+  compliance = {
+    bizName: bizName.value,
+    licenseNo: licenseNo.value,
+    gstin: gstin.value,
+    tinId: tinId.value,
+    panNo: panNo.value
+  };
+
+  save();
+  complianceMsg.textContent = "Compliance details saved in browser.";
+}
+
+function loadCompliance() {
+  bizName.value = compliance.bizName || "";
+  licenseNo.value = compliance.licenseNo || "";
+  gstin.value = compliance.gstin || "";
+  tinId.value = compliance.tinId || "";
+  panNo.value = compliance.panNo || "";
+}
+
+function renderAll() {
+  renderProducts();
+  renderDashboard();
+  renderSellSelect();
+  renderSales();
+  renderInvoice();
+  loadCompliance();
+}
+
+newInvoice();
+renderAll();
+</script>
+</body>
+</html>
