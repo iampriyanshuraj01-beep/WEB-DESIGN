@@ -1,0 +1,245 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Random Joke Generator - Get hilarious jokes from multiple APIs">
+  <title>Random Joke Generator</title>
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+  <div class="container">
+    <!-- Header -->
+    <header class="header">
+      <div class="header-content">
+        <div class="logo">
+          <span class="logo-icon">😂</span>
+          <h1>JokeHub</h1>
+        </div>
+        <div class="header-controls">
+          <div class="search-box">
+            <input type="text" id="searchInput" placeholder="Search jokes..." class="search-input">
+            <button class="search-btn" onclick="searchJokes()">🔍</button>
+          </div>
+          <button class="theme-toggle" onclick="toggleTheme()" title="Toggle dark mode">🌙</button>
+          <button class="settings-btn" onclick="openSettings()" title="Settings">⚙️</button>
+        </div>
+      </div>
+    </header>
+
+    <!-- Navigation Tabs -->
+    <nav class="nav-tabs">
+      <button class="nav-tab active" onclick="showTab('home', this)">🏠 Home</button>
+      <button class="nav-tab" onclick="showTab('favorites', this)">❤️ Favorites</button>
+      <button class="nav-tab" onclick="showTab('history', this)">📜 History</button>
+      <button class="nav-tab" onclick="showTab('settings', this)">⚙️ Settings</button>
+    </nav>
+
+    <!-- Main Content -->
+    <main class="main-content">
+      <!-- Home Tab -->
+      <section id="home" class="tab-content active">
+        <div class="joke-section">
+          <!-- Filters -->
+          <div class="filters">
+            <div class="filter-group">
+              <label for="categorySelect">Category:</label>
+              <select id="categorySelect" class="filter-select">
+                <option value="Any">Random</option>
+                <option value="General">General</option>
+                <option value="Programming">Programming</option>
+                <option value="Knock-knock">Knock-knock</option>
+                <option value="Dark">Dark</option>
+                <option value="Spooky">Spooky</option>
+                <option value="Religious">Religious</option>
+              </select>
+            </div>
+            <div class="filter-group">
+              <label for="apiSelect">API:</label>
+              <select id="apiSelect" class="filter-select">
+                <option value="auto">Auto</option>
+                <option value="jokeapi">JokeAPI</option>
+                <option value="official">Official API</option>
+              </select>
+            </div>
+          </div>
+
+          <!-- Joke Display Area -->
+          <div class="joke-display">
+            <div class="joke-card" id="jokeCard">
+              <div class="joke-content" id="jokeContent">
+                <p class="joke-text">Click "Get Joke" to start laughing! 😄</p>
+              </div>
+              <div class="joke-meta" id="jokeMeta">
+                <span class="meta-item">Ready for humor?</span>
+              </div>
+            </div>
+
+            <!-- Loading Spinner -->
+            <div class="loading-spinner" id="loadingSpinner" style="display: none;">
+              <div class="spinner"></div>
+              <p>Fetching joke...</p>
+            </div>
+          </div>
+
+          <!-- Action Buttons -->
+          <div class="action-buttons">
+            <button class="btn btn-primary" onclick="getJoke()" id="getJokeBtn">
+              <span>😂 Get Joke</span>
+              <span class="shortcut">(Space)</span>
+            </button>
+            <button class="btn btn-secondary" onclick="copyToClipboard()" id="copyBtn" disabled>
+              <span>📋 Copy</span>
+              <span class="shortcut">(C)</span>
+            </button>
+            <button class="btn btn-secondary" onclick="toggleFavorite()" id="favoriteBtn" disabled>
+              <span>🤍 Favorite</span>
+              <span class="shortcut">(F)</span>
+            </button>
+            <button class="btn btn-secondary" onclick="shareJoke()" id="shareBtn" disabled>
+              <span>📤 Share</span>
+            </button>
+          </div>
+
+          <!-- Notification -->
+          <div class="notification" id="notification"></div>
+        </div>
+      </section>
+
+      <!-- Favorites Tab -->
+      <section id="favorites" class="tab-content">
+        <div class="favorites-section">
+          <div class="section-header">
+            <h2>Favorite Jokes</h2>
+            <div class="section-controls">
+              <input type="text" id="favSearch" placeholder="Search favorites..." class="search-input small">
+              <button class="btn btn-small" onclick="exportFavorites()">📥 Export</button>
+              <button class="btn btn-danger btn-small" onclick="clearFavorites()" id="clearFavBtn" disabled>🗑️ Clear</button>
+            </div>
+          </div>
+          <div class="jokes-list" id="favoritesList">
+            <p class="empty-state">No favorites yet. Add jokes to your favorites! ❤️</p>
+          </div>
+        </div>
+      </section>
+
+      <!-- History Tab -->
+      <section id="history" class="tab-content">
+        <div class="history-section">
+          <div class="section-header">
+            <h2>View History</h2>
+            <div class="section-controls">
+              <input type="text" id="histSearch" placeholder="Search history..." class="search-input small">
+              <button class="btn btn-danger btn-small" onclick="clearHistory()" id="clearHistBtn" disabled>🗑️ Clear</button>
+            </div>
+          </div>
+          <div class="jokes-list" id="historyList">
+            <p class="empty-state">No history yet. Get jokes to see them here! 📜</p>
+          </div>
+        </div>
+      </section>
+
+      <!-- Settings Tab -->
+      <section id="settings" class="tab-content">
+        <div class="settings-section">
+          <div class="settings-group">
+            <h3>Appearance</h3>
+            <div class="setting-item">
+              <label for="themeToggle">Dark Mode</label>
+              <input type="checkbox" id="themeToggle" onchange="toggleTheme()" class="toggle-switch">
+            </div>
+          </div>
+
+          <div class="settings-group">
+            <h3>API Settings</h3>
+            <div class="setting-item">
+              <label>Preferred API</label>
+              <select id="preferredAPI" class="filter-select" onchange="saveSettings()">
+                <option value="auto">Auto (Fallback enabled)</option>
+                <option value="jokeapi">JokeAPI only</option>
+                <option value="official">Official API only</option>
+              </select>
+            </div>
+            <div class="setting-item">
+              <label>Default Category</label>
+              <select id="defaultCategory" class="filter-select" onchange="saveSettings()">
+                <option value="Any">Random</option>
+                <option value="General">General</option>
+                <option value="Programming">Programming</option>
+                <option value="Knock-knock">Knock-knock</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="settings-group">
+            <h3>Data Management</h3>
+            <div class="setting-item">
+              <label>Storage Usage</label>
+              <div class="storage-bar">
+                <div class="storage-used" id="storageUsed"></div>
+              </div>
+              <small id="storageText">Calculating...</small>
+            </div>
+            <div class="button-group">
+              <button class="btn btn-secondary" onclick="exportData()">📥 Export Data</button>
+              <button class="btn btn-secondary" onclick="importData()">📤 Import Data</button>
+              <button class="btn btn-danger" onclick="resetAll()">🔄 Reset All</button>
+            </div>
+          </div>
+
+          <div class="settings-group">
+            <h3>About</h3>
+            <div class="about-info">
+              <p><strong>Joke Generator v1.0</strong></p>
+              <p>A fun app to get random jokes from multiple APIs</p>
+              <p><small>APIs: JokeAPI, Official Joke API</small></p>
+              <p><small>Created with ❤️ by JokeHub</small></p>
+            </div>
+          </div>
+        </div>
+      </section>
+    </main>
+
+    <!-- Footer -->
+    <footer class="footer">
+      <div class="footer-content">
+        <div class="footer-section">
+          <h4>APIs Used</h4>
+          <ul>
+            <li><a href="https://jokeapi.dev" target="_blank">JokeAPI</a></li>
+            <li><a href="https://official-joke-api.appspot.com" target="_blank">Official Joke API</a></li>
+          </ul>
+        </div>
+        <div class="footer-section">
+          <h4>Features</h4>
+          <ul>
+            <li>Multiple Categories</li>
+            <li>Favorites & History</li>
+            <li>Dark Mode</li>
+            <li>Export/Import Data</li>
+          </ul>
+        </div>
+        <div class="footer-section">
+          <h4>Help</h4>
+          <ul>
+            <li><a href="#" onclick="showHelp()">Keyboard Shortcuts</a></li>
+            <li><a href="#" onclick="showAbout()">About</a></li>
+            <li><a href="#" onclick="showFeedback()">Feedback</a></li>
+          </ul>
+        </div>
+      </div>
+      <div class="footer-bottom">
+        <p>&copy; 2024 Random Joke Generator. All rights reserved. Made with 😄 for you!</p>
+      </div>
+    </footer>
+  </div>
+
+  <!-- Hidden file input for import -->
+  <input type="file" id="importFile" accept=".json" style="display: none;" onchange="handleImport(event)">
+
+  <!-- Scripts -->
+  <script src="js/api.js"></script>
+  <script src="js/utils.js"></script>
+  <script src="js/app.js"></script>
+</body>
+</html>
