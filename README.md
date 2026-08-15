@@ -1,6 +1,12 @@
+# WEB-DESIGN
+
+A simple static HTML website for showcasing web design examples and templates. See SETUP.md for setup and deployment instructions.
+
+---
+
 # 📦 InventPro - Advanced Inventory Management System
 
-A modern, feature-rich **Inventory Management System** built with pure HTML, CSS, and JavaScript. Manage products, billing, sales, GST compliance, and business reports all in one elegant dashboard—no backend required!
+A modern, feature-rich **Inventory Management System** built with pure HTML, CSS, and JavaScript. Manage products, billing, sales, GST compliance, and business reports all in one elegant dashboard — [original README retained]
 
 ## ✨ Features
 
@@ -103,7 +109,7 @@ Inventory Value = Stock × Selling Price (per product)
 ✅ Warehouse management  
 ✅ Billing and invoicing  
 ✅ Tax compliance tracking  
-✅ Profit analysis for SMEs  
+✅ Profit analysis for SMEs
 
 ## 📊 Sample Data
 
@@ -124,8 +130,8 @@ All your data is stored **locally in your browser**. No information is sent to a
 
 This system calculates sales, profit, and GST for learning and reference purposes. For official tax filing:
 
-- **GST Portal**: [https://www.gst.gov.in/](https://www.gst.gov.in/)
-- **Income Tax Filing**: [https://www.incometax.gov.in/](https://www.incometax.gov.in/)
+- **GST Portal**: https://www.gst.gov.in/
+- **Income Tax Filing**: https://www.incometax.gov.in/
 
 ⚠️ **Important**: Always verify tax filing details with a qualified CA (Chartered Accountant) or official portals before submission.
 
@@ -153,7 +159,7 @@ Replace "Rs." with your currency symbol in the `money()` function (JavaScript).
 ✅ Firefox  
 ✅ Safari  
 ✅ Edge  
-✅ Mobile Browsers  
+✅ Mobile Browsers
 
 ## 📞 Support & Feedback
 
